@@ -9,6 +9,7 @@ use VSing\ParkingPlatform\Kernel\ServiceContainer;
  * Class Factory.
  *
  * @method static \VSing\ParkingPlatform\Parking\Application      Parking(array $config)
+ * @method static \VSing\ParkingPlatform\Point\Application      Point(array $config)
  */
 class Factory
 {

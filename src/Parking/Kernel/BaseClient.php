@@ -115,7 +115,6 @@ class BaseClient
             'version'=>"2.0"
         ];
         var_dump($send);
-//        $send['sign']=strtoupper(SquireelMD5::makeSign($send,$secret));
         return $this->request($url, 'POST', ['query' => $query, 'json' => $send]);
     }
 
