@@ -3,7 +3,7 @@
 /*
  * This file is part of the overtrue/wechat.
  *
- * (c) overtrue <i@overtrue.me>
+ * (c) v-sing <email1946367301@163.com>
  *
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
@@ -14,11 +14,12 @@ namespace VSing\ParkingPlatform\Kernel\Providers;
 use VSing\ParkingPlatform\Kernel\Log\LogManager;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
+use VSing\ParkingPlatform\ParkingPlatform;
 
 /**
  * Class LoggingServiceProvider.
  *
- * @author overtrue <i@overtrue.me>
+ * @author v-sing <email1946367301@163.com>
  */
 class LogServiceProvider implements ServiceProviderInterface
 {
@@ -33,15 +34,46 @@ class LogServiceProvider implements ServiceProviderInterface
     public function register(Container $pimple)
     {
         !isset($pimple['log']) && $pimple['log'] = function ($app) {
-            $config = $app['config']->get('log');
-
+            $config = $this->formatLogConfig($app);
             if (!empty($config)) {
                 $app->rebind('config', $app['config']->merge($config));
             }
-
             return new LogManager($app);
         };
 
         !isset($pimple['logger']) && $pimple['logger'] = $pimple['log'];
+    }
+
+    public function formatLogConfig($app)
+    {
+        if (!empty($app['config']->get('log.channels'))) {
+            return $app['config']->get('log');
+        }
+
+        if (empty($app['config']->get('log'))) {
+            return [
+                'log' => [
+                    'default'  => 'null',
+                    'channels' => [
+                        'null' => [
+                            'driver' => 'null',
+                        ],
+                    ],
+                ],
+            ];
+        }
+
+        return [
+            'log' => [
+                'default'  => 'single',
+                'channels' => [
+                    'single' => [
+                        'driver' => 'single',
+                        'path'   => $app['config']->get('log.file') ?: \sys_get_temp_dir() . '/logs/parkingPlatform.log',
+                        'level'  => $app['config']->get('log.level', 'debug'),
+                    ],
+                ],
+            ],
+        ];
     }
 }

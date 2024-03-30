@@ -9,10 +9,11 @@
 // | Author: liu21st <liu21st@gmail.com>
 // +----------------------------------------------------------------------
 
-namespace VSing\ParkingPlatform\Kernel;
+namespace VSing\ParkingPlatform\Kernel\Cache;
 
 
 use VSing\ParkingPlatform\Factory;
+use VSing\ParkingPlatform\Kernel\ServiceContainer;
 use VSing\ParkingPlatform\Parking\Application;
 use VSing\ParkingPlatform\ParkingPlatform;
 
@@ -21,22 +22,36 @@ class Cache
     /**
      * @var array 缓存的实例
      */
-    public static $instance = [];
+    public $instance = [];
 
     /**
      * @var int 缓存读取次数
      */
-    public static $readTimes = 0;
+    public $readTimes = 0;
 
     /**
      * @var int 缓存写入次数
      */
-    public static $writeTimes = 0;
+    public $writeTimes = 0;
 
     /**
      * @var object 操作句柄
      */
-    public static $handler;
+    public $handler;
+
+    protected $app;
+
+
+    /**
+     * Cache constructor.
+     *
+     * @param ServiceContainer $app
+     */
+    public function __construct(ServiceContainer $app)
+    {
+        $this->app = $app;
+
+    }
 
     /**
      * 连接缓存驱动
@@ -45,30 +60,23 @@ class Cache
      * @param bool|string $name 缓存连接标识 true 强制重新连接
      * @return Driver
      */
-    public static function connect(array $options = [], $name = false)
+    public function connect(array $options = [], $name = false)
     {
         $type = !empty($options['type']) ? $options['type'] : 'File';
 
         if (false === $name) {
             $name = md5(serialize($options));
         }
-
-        if (true === $name || !isset(self::$instance[$name])) {
+        if (true === $name || !isset($this->instance[$name])) {
             $class = false === strpos($type, '\\') ?
                 '\\VSing\\ParkingPlatform\\Kernel\\Cache\\Driver\\' . ucwords($type) :
                 $type;
-
-            // 记录初始化信息
-//            App::$debug && Log::record('[ CACHE ] INIT ' . $type, 'info');
-
             if (true === $name) {
                 return new $class($options);
             }
-
-            self::$instance[$name] = new $class($options);
+            $this->instance[$name] = new $class($options);
         }
-
-        return self::$instance[$name];
+        return $this->instance[$name];
     }
 
     /**
@@ -77,10 +85,10 @@ class Cache
      * @param array $options 配置数组
      * @return Driver
      */
-    public static function init(array $options = [])
+    public function init(array $options = [])
     {
-        if (is_null(self::$handler)) {
-            $config = ParkingPlatform::config();
+        if (is_null($this->handler)) {
+            $config = $this->app['config'];
             if (empty($options) && 'complex' == $config['cache']['type']) {
                 $default = $config['cache']['default'];
                 // 获取默认缓存配置，并连接
@@ -88,11 +96,10 @@ class Cache
             } elseif (empty($options)) {
                 $options = $config['cache'];
             }
-
-            self::$handler = self::connect($options);
+            $this->handler = $this->connect($options);
         }
 
-        return self::$handler;
+        return $this->handler;
     }
 
     /**
@@ -101,13 +108,13 @@ class Cache
      * @param string $name 缓存标识
      * @return Driver
      */
-    public static function store($name = '')
+    public function store($name = '')
     {
-        $config = ParkingPlatform::config();
+        $config = $this->app['config'];
         if ('' !== $name && 'complex' == $config['cache']['type']) {
-            return self::connect($config['cache'][$name], strtolower($name));
+            return $this->connect($config['cache'][$name], strtolower($name));
         }
-        return self::init();
+        return $this->init();
     }
 
     /**
@@ -116,11 +123,11 @@ class Cache
      * @param string $name 缓存变量名
      * @return bool
      */
-    public static function has($name)
+    public function has($name)
     {
-        self::$readTimes++;
+        $this->readTimes++;
 
-        return self::init()->has($name);
+        return $this->init()->has($name);
     }
 
     /**
@@ -130,11 +137,10 @@ class Cache
      * @param mixed $default 默认值
      * @return mixed
      */
-    public static function get($name, $default = false)
+    public function get($name, $default = false)
     {
-        self::$readTimes++;
-
-        return self::init()->get($name, $default);
+        $this->readTimes++;
+        return $this->init()->get($name, $default);
     }
 
     /**
@@ -145,11 +151,11 @@ class Cache
      * @param int|null $expire 有效时间 0为永久
      * @return boolean
      */
-    public static function set($name, $value, $expire = null)
+    public function set($name, $value, $expire = null)
     {
-        self::$writeTimes++;
+        $this->writeTimes++;
 
-        return self::init()->set($name, $value, $expire);
+        return $this->init()->set($name, $value, $expire);
     }
 
     /**
@@ -159,11 +165,11 @@ class Cache
      * @param int $step 步长
      * @return false|int
      */
-    public static function inc($name, $step = 1)
+    public function inc($name, $step = 1)
     {
-        self::$writeTimes++;
+        $this->writeTimes++;
 
-        return self::init()->inc($name, $step);
+        return $this->init()->inc($name, $step);
     }
 
     /**
@@ -173,11 +179,11 @@ class Cache
      * @param int $step 步长
      * @return false|int
      */
-    public static function dec($name, $step = 1)
+    public function dec($name, $step = 1)
     {
-        self::$writeTimes++;
+        $this->writeTimes++;
 
-        return self::init()->dec($name, $step);
+        return $this->init()->dec($name, $step);
     }
 
     /**
@@ -186,11 +192,11 @@ class Cache
      * @param string $name 缓存标识
      * @return boolean
      */
-    public static function rm($name)
+    public function rm($name)
     {
-        self::$writeTimes++;
+        $this->writeTimes++;
 
-        return self::init()->rm($name);
+        return $this->init()->rm($name);
     }
 
     /**
@@ -199,11 +205,11 @@ class Cache
      * @param string $tag 标签名
      * @return boolean
      */
-    public static function clear($tag = null)
+    public function clear($tag = null)
     {
-        self::$writeTimes++;
+        $this->writeTimes++;
 
-        return self::init()->clear($tag);
+        return $this->init()->clear($tag);
     }
 
     /**
@@ -212,12 +218,12 @@ class Cache
      * @param string $name 缓存变量名
      * @return mixed
      */
-    public static function pull($name)
+    public function pull($name)
     {
-        self::$readTimes++;
-        self::$writeTimes++;
+        $this->readTimes++;
+        $this->writeTimes++;
 
-        return self::init()->pull($name);
+        return $this->init()->pull($name);
     }
 
     /**
@@ -228,11 +234,11 @@ class Cache
      * @param int $expire 有效时间 0为永久
      * @return mixed
      */
-    public static function remember($name, $value, $expire = null)
+    public function remember($name, $value, $expire = null)
     {
-        self::$readTimes++;
+        $this->readTimes++;
 
-        return self::init()->remember($name, $value, $expire);
+        return $this->init()->remember($name, $value, $expire);
     }
 
     /**
@@ -243,9 +249,9 @@ class Cache
      * @param bool $overlay 是否覆盖
      * @return Driver
      */
-    public static function tag($name, $keys = null, $overlay = false)
+    public function tag($name, $keys = null, $overlay = false)
     {
-        return self::init()->tag($name, $keys, $overlay);
+        return $this->init()->tag($name, $keys, $overlay);
     }
 
 }

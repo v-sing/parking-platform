@@ -3,7 +3,7 @@
 /*
  * This file is part of the overtrue/wechat.
  *
- * (c) overtrue <i@overtrue.me>
+ * (c) v-sing <email1946367301@163.com>
  *
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
@@ -31,7 +31,7 @@ use Psr\Log\LoggerInterface;
 /**
  * Class LogManager.
  *
- * @author overtrue <i@overtrue.me>
+ * @author v-sing <email1946367301@163.com>
  */
 class LogManager implements LoggerInterface
 {
@@ -78,6 +78,8 @@ class LogManager implements LoggerInterface
     public function __construct(ServiceContainer $app)
     {
         $this->app = $app;
+//        $this->channels=array_merge($app['config']['log']['channels']);
+
     }
 
     /**
@@ -158,8 +160,9 @@ class LogManager implements LoggerInterface
      */
     protected function resolve($name)
     {
-        $config = $this->app['config']->get(\sprintf('log.channels.%s', $name));
 
+        $config = $this->app['config']->get(\sprintf('log.channels.%s', $name));
+//        var_dump($config);exit;
         if (is_null($config)) {
             throw new InvalidArgumentException(\sprintf('Log [%s] is not defined.', $name));
         }
@@ -169,7 +172,6 @@ class LogManager implements LoggerInterface
         }
 
         $driverMethod = 'create' . ucfirst($config['driver']) . 'Driver';
-
         if (method_exists($this, $driverMethod)) {
             return $this->{$driverMethod}($config);
         }
@@ -186,8 +188,8 @@ class LogManager implements LoggerInterface
      */
     protected function createEmergencyLogger()
     {
-        return new Monolog('EasyWeChat', $this->prepareHandlers([new StreamHandler(
-            \sys_get_temp_dir() . '/easywechat/easywechat.log',
+        return new Monolog('ParkingPlatform', $this->prepareHandlers([new StreamHandler(
+            \sys_get_temp_dir() . '/parkingPlatform/parkingPlatform.log',
             $this->level(['level' => 'debug'])
         )]));
     }
@@ -285,7 +287,7 @@ class LogManager implements LoggerInterface
             $this->prepareHandler(new SlackWebhookHandler(
                 $config['url'],
                 $config['channel'] ?? null,
-                $config['username'] ?? 'EasyWeChat',
+                $config['username'] ?? 'ParkingPlatform',
                 $config['attachment'] ?? true,
                 $config['emoji'] ?? ':boom:',
                 $config['short'] ?? false,
@@ -308,7 +310,7 @@ class LogManager implements LoggerInterface
     {
         return new Monolog($this->parseChannel($config), [
             $this->prepareHandler(new SyslogHandler(
-                'EasyWeChat',
+                'ParkingPlatform',
                 $config['facility'] ?? LOG_USER,
                 $this->level($config)
             ), $config),
@@ -391,7 +393,7 @@ class LogManager implements LoggerInterface
      */
     protected function parseChannel(array $config): string
     {
-        return $config['name'] ?? 'EasyWeChat';
+        return $config['name'] ?? 'ParkingPlatform';
     }
 
     /**

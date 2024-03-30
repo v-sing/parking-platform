@@ -109,14 +109,14 @@ class BaseClient
     public function httpPostJson(string $url, array $data = [], $item = [], array $query = []): array
     {
         $cacheKey = 'login-token';
-        $token    = Cache::get($cacheKey);
+        $token    = $this->app->cache->get($cacheKey);
         if (!$token) {
             $result = $this->app['login']->get();
             if ($result['resultCode'] !== 0) {
                 return $result;
             }
             $token = $result['token'];
-            Cache::set($cacheKey, $token, ((int)$this->app->config->get('expire')) * 60);
+            $this->app->cache->set($cacheKey, $token, ((int)$this->app->config->get('expire')) * 60);
         }
         $body = [
             'cid' => $this->app->config->get('cid'),

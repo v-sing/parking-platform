@@ -3,7 +3,7 @@
 /*
  * This file is part of the overtrue/wechat.
  *
- * (c) overtrue <i@overtrue.me>
+ * (c) v-sing <email1946367301@163.com>
  *
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
@@ -13,6 +13,8 @@ namespace VSing\ParkingPlatform\Kernel;
 
 use GuzzleHttp\Client;
 use Monolog\Logger;
+use VSing\ParkingPlatform\Kernel\Cache\Cache;
+use VSing\ParkingPlatform\Kernel\Providers\CacheServiceProvider;
 use VSing\ParkingPlatform\Kernel\Providers\EventDispatcherServiceProvider;
 use VSing\ParkingPlatform\Kernel\Providers\ExtensionServiceProvider;
 use VSing\ParkingPlatform\Kernel\Providers\HttpClientServiceProvider;
@@ -27,12 +29,13 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * Class ServiceContainer.
  *
- * @author overtrue <i@overtrue.me>
+ * @author v-sing <email1946367301@163.com>
  *
  * @property Config $config
  * @property Request $request
  * @property Client $http_client
  * @property Logger $logger
+ * @property Cache $cache
  * @property EventDispatcher $events
  */
 class ServiceContainer extends Container
@@ -114,6 +117,7 @@ class ServiceContainer extends Container
     {
         return array_merge([
             ConfigServiceProvider::class,
+            CacheServiceProvider::class,
             LogServiceProvider::class,
             RequestServiceProvider::class,
             HttpClientServiceProvider::class,

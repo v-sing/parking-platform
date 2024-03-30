@@ -3,7 +3,7 @@
 /*
  * This file is part of the overtrue/wechat.
  *
- * (c) overtrue <i@overtrue.me>
+ * (c) v-sing <email1946367301@163.com>
  *
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
@@ -19,7 +19,7 @@ use Psr\Http\Message\ResponseInterface;
 /**
  * Class Response.
  *
- * @author overtrue <i@overtrue.me>
+ * @author v-sing <email1946367301@163.com>
  */
 class Response extends GuzzleResponse
 {

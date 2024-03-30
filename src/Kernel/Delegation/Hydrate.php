@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /*
- * This file is part of the EasyWeChatComposer.
+ * This file is part of the ParkingPlatformComposer.
  *
  * (c) 张铭阳 <mingyoungcheung@gmail.com>
  *
@@ -53,11 +53,11 @@ class Hydrate
     {
         $application = $this->attributes['application'];
 
-//        if ($application === EasyWeChat\OpenPlatform\Authorizer\OfficialAccount\Application::class) {
+//        if ($application === ParkingPlatform\OpenPlatform\Authorizer\OfficialAccount\Application::class) {
 //            return $this->createsOpenPlatformApplication('officialAccount');
 //        }
 //
-//        if ($application === EasyWeChat\OpenPlatform\Authorizer\MiniProgram\Application::class) {
+//        if ($application === ParkingPlatform\OpenPlatform\Authorizer\MiniProgram\Application::class) {
 //            return $this->createsOpenPlatformApplication('miniProgram');
 //        }
 

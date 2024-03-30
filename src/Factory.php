@@ -25,7 +25,6 @@ class Factory
     {
         $namespace   = Kernel\Support\Str::studly($name);
         $application = "\\VSing\\ParkingPlatform\\{$namespace}\\Application";
-        ParkingPlatform::mergeConfig($config);
         return new $application($config);
     }
 
