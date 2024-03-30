@@ -15,7 +15,6 @@ namespace VSing\ParkingPlatform\Kernel\Cache;
 use VSing\ParkingPlatform\Factory;
 use VSing\ParkingPlatform\Kernel\ServiceContainer;
 use VSing\ParkingPlatform\Parking\Application;
-use VSing\ParkingPlatform\ParkingPlatform;
 
 class Cache
 {
