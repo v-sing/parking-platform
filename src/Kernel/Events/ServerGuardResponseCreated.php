@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * Class ServerGuardResponseCreated.
  *
- * @author mingyoung <mingyoungcheung@gmail.com>
+ * @author v-sing <email1946367301@163.com>
  */
 class ServerGuardResponseCreated
 {

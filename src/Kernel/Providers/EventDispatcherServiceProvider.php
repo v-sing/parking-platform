@@ -18,7 +18,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 /**
  * Class EventDispatcherServiceProvider.
  *
- * @author mingyoung <mingyoungcheung@gmail.com>
+ * @author v-sing <email1946367301@163.com>
  */
 class EventDispatcherServiceProvider implements ServiceProviderInterface
 {

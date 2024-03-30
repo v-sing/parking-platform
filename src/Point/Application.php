@@ -8,7 +8,7 @@ use VSing\ParkingPlatform\Kernel\ServiceContainer;
 /**
  *  Class Application.
  *
- * @author mingyoung <mingyoungcheung@gmail.com>
+ * @author v-sing <email1946367301@163.com>
  *
  * @property \VSing\ParkingPlatform\Point\Store\Client $store
  * @property \VSing\ParkingPlatform\Point\Member\Client $memberInfo

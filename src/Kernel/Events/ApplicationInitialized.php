@@ -16,7 +16,7 @@ use VSing\ParkingPlatform\Kernel\ServiceContainer;
 /**
  * Class ApplicationInitialized.
  *
- * @author mingyoung <mingyoungcheung@gmail.com>
+ * @author v-sing <email1946367301@163.com>
  */
 class ApplicationInitialized
 {

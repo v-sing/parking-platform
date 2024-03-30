@@ -13,16 +13,24 @@ namespace VSing\ParkingPlatform\Parking;
 
 use VSing\ParkingPlatform\Kernel\ServiceContainer;
 use VSing\ParkingPlatform\Parking\Login\Client;
+use VSing\ParkingPlatform\Parking\Order\CreateOrder;
+use VSing\ParkingPlatform\Parking\Order\GenerateOrder;
+use VSing\ParkingPlatform\Parking\Order\NotifyOrder;
+use VSing\ParkingPlatform\Parking\Order\QueryOrder;
 use VSing\ParkingPlatform\Parking\Query\QueryCarByCarNo;
 
 
 /**
  *  Class Application.
  *
- * @author mingyoung <mingyoungcheung@gmail.com>
+ * @author v-sing <email1946367301@163.com>
  *
  * @property QueryCarByCarNo $queryCarByCarNo
  * @property Client $login
+ * @property CreateOrder $createOrder
+ * @property GenerateOrder $generateOrder
+ * @property NotifyOrder $notifyOrder
+ * @property QueryOrder $queryOrder
  *
  *
  */
@@ -32,9 +40,7 @@ class Application extends ServiceContainer
     protected $providers = [
         Query\ServiceProvider::class,
         Login\ServiceProvider::class,
-        //        Store\ServiceProvider::class,
-        //        Delivery\ServiceProvider::class,
-        //        Order\ServiceProvider::class
+        Order\ServiceProvider::class,
     ];
 
     /**

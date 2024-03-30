@@ -16,7 +16,7 @@ use Psr\Http\Message\ResponseInterface;
 /**
  * Class HttpResponseCreated.
  *
- * @author mingyoung <mingyoungcheung@gmail.com>
+ * @author v-sing <email1946367301@163.com>
  */
 class HttpResponseCreated
 {
