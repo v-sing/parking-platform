@@ -4,6 +4,7 @@ namespace VSing\ParkingPlatform;
 
 use VSing\ParkingPlatform\Kernel\ServiceContainer;
 
+defined('DS') or define('DS', DIRECTORY_SEPARATOR);
 
 /**
  * Class Factory.
@@ -22,8 +23,9 @@ class Factory
      */
     public static function make(string $name, array $config): ServiceContainer
     {
-        $namespace = Kernel\Support\Str::studly($name);
+        $namespace   = Kernel\Support\Str::studly($name);
         $application = "\\VSing\\ParkingPlatform\\{$namespace}\\Application";
+        ParkingPlatform::mergeConfig($config);
         return new $application($config);
     }
 

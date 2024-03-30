@@ -9,10 +9,11 @@
  * with this source code in the file LICENSE.
  */
 
-namespace  VSing\ParkingPlatform\Parking;
+namespace VSing\ParkingPlatform\Parking;
 
 use VSing\ParkingPlatform\Kernel\ServiceContainer;
-use VSing\ParkingPlatform\Parking\Query\QueryParkSpace;
+use VSing\ParkingPlatform\Parking\Login\Client;
+use VSing\ParkingPlatform\Parking\Query\QueryCarByCarNo;
 
 
 /**
@@ -20,7 +21,8 @@ use VSing\ParkingPlatform\Parking\Query\QueryParkSpace;
  *
  * @author mingyoung <mingyoungcheung@gmail.com>
  *
- * @property QueryParkSpace $queryParkSpace
+ * @property QueryCarByCarNo $queryCarByCarNo
+ * @property Client $login
  *
  *
  */
@@ -29,10 +31,10 @@ class Application extends ServiceContainer
 
     protected $providers = [
         Query\ServiceProvider::class,
-//        Merchant\ServiceProvider::class,
-//        Store\ServiceProvider::class,
-//        Delivery\ServiceProvider::class,
-//        Order\ServiceProvider::class
+        Login\ServiceProvider::class,
+        //        Store\ServiceProvider::class,
+        //        Delivery\ServiceProvider::class,
+        //        Order\ServiceProvider::class
     ];
 
     /**

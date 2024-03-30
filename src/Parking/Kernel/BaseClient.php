@@ -3,12 +3,15 @@
 namespace VSing\ParkingPlatform\Parking\Kernel;
 
 use GuzzleHttp\Exception\GuzzleException;
+use VSing\ParkingPlatform\Factory;
+use VSing\ParkingPlatform\Kernel\Cache;
 use VSing\ParkingPlatform\Kernel\Contracts\Arrayable;
 use VSing\ParkingPlatform\Kernel\Events\HttpResponseCreated;
 use VSing\ParkingPlatform\Kernel\Exceptions\InvalidConfigException;
 use  VSing\ParkingPlatform\Kernel\Http\Response;
 use VSing\ParkingPlatform\Kernel\ServiceContainer;
 use VSing\ParkingPlatform\Kernel\Sign\MD5;
+use VSing\ParkingPlatform\Kernel\Sign\ParkMD5;
 use VSing\ParkingPlatform\Kernel\Sign\SquireelMD5;
 use VSing\ParkingPlatform\Kernel\Support\Collection;
 use  VSing\ParkingPlatform\Kernel\Traits\HasHttpRequests;
@@ -24,6 +27,7 @@ class BaseClient
         request as performRequest;
     }
 
+
     /**
      * @var ServiceContainer
      */
@@ -34,8 +38,8 @@ class BaseClient
      */
     protected $baseUri;
 
-    protected $requestType='DATA';
-    protected $serviceId='';
+    protected $requestType = 'DATA';
+    protected $serviceId = '';
 
     /**
      * BaseClient constructor.
@@ -99,23 +103,43 @@ class BaseClient
      * @param array $data
      * @param array $query
      *
-     * @return array|object|Arrayable|Response|Collection|ResponseInterface
+     * @return array
      *
-     * @throws InvalidConfigException
-     * @throws GuzzleException
      */
-    public function httpPostJson(string $url, array $data = [],$item=[], array $query = [])
+    public function httpPostJson(string $url, array $data = [], $item = [], array $query = []): array
     {
-
-        $send = [
+        $cacheKey = 'login-token';
+        $token    = Cache::get($cacheKey);
+        if (!$token) {
+            $result = $this->app['login']->get();
+            if ($result['resultCode'] !== 0) {
+                return $result;
+            }
+            $token = $result['token'];
+            Cache::set($cacheKey, $token, ((int)$this->app->config->get('expire')) * 60);
+        }
+        $body = [
+            'cid' => $this->app->config->get('cid'),
+            'v'   => $this->app->config->get('v'),
+            'tn'  => $token,
+        ];
+        $p    = [
             'serviceId'   => $this->serviceId,
             'requestType' => $this->requestType,
             'attributes'  => $data,
-            'dataItems'   => $item,
-            'version'=>"2.0"
         ];
-        var_dump($send);
-        return $this->request($url, 'POST', ['query' => $query, 'json' => $send]);
+        if ($item) {
+            $p['dataItems'] = $item;
+        }
+        $body['p']  = json_encode($p);
+        $body['sn'] = ParkMD5::makeSign($p, $this->app->config->get('signKey'));
+        try {
+            return $this->request($url . "?" . http_build_query($body), 'POST');
+        } catch (GuzzleException $e) {
+            return ['resultCode' => 1, 'message' => 'GuzzleException失败'];
+        } catch (InvalidConfigException $e) {
+            return ['resultCode' => 1, 'message' => 'InvalidConfigException失败'];
+        }
     }
 
 
@@ -131,6 +155,7 @@ class BaseClient
      */
     public function request(string $url, string $method = 'GET', array $options = [], $returnRaw = false)
     {
+
         if (empty($this->middlewares)) {
             $this->registerHttpMiddlewares();
         }
@@ -175,7 +200,6 @@ class BaseClient
     protected function logMiddleware()
     {
         $formatter = new MessageFormatter($this->app['config']['http.log_template'] ?? MessageFormatter::DEBUG);
-
         return Middleware::log($this->app['logger'], $formatter, LogLevel::DEBUG);
     }
 

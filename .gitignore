@@ -6,3 +6,4 @@ composer.lock
 !.gitkeep
 .vscode
 .git/*
+/test/cache/*

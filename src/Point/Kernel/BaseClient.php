@@ -3,7 +3,11 @@
 namespace VSing\ParkingPlatform\Point\Kernel;
 
 use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\MessageFormatter;
+use GuzzleHttp\Middleware;
+use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Log\LogLevel;
 use VSing\ParkingPlatform\Kernel\Contracts\Arrayable;
 use VSing\ParkingPlatform\Kernel\Exceptions\InvalidConfigException;
 use VSing\ParkingPlatform\Kernel\Http\Response;
@@ -71,4 +75,73 @@ class BaseClient
 
     }
 
+    /**
+     * @param string $url
+     * @param string $method
+     * @param array $options
+     *
+     * @return Response
+     *
+     * @throws InvalidConfigException
+     * @throws GuzzleException
+     */
+    public function requestRaw(string $url, string $method = 'GET', array $options = [])
+    {
+        return Response::buildFromPsrResponse($this->request($url, $method, $options, true));
+    }
+
+    /**
+     * Register Guzzle middlewares.
+     */
+    protected function registerHttpMiddlewares()
+    {
+        // retry
+        $this->pushMiddleware($this->retryMiddleware(), 'retry');
+        // log
+        $this->pushMiddleware($this->logMiddleware(), 'log');
+    }
+
+    /**
+     * Log the request.
+     *
+     * @return \Closure
+     */
+    protected function logMiddleware()
+    {
+        $formatter = new MessageFormatter($this->app['config']['http.log_template'] ?? MessageFormatter::DEBUG);
+
+        return Middleware::log($this->app['logger'], $formatter, LogLevel::DEBUG);
+    }
+
+    /**
+     * Return retry middleware.
+     *
+     * @return \Closure
+     */
+    protected function retryMiddleware()
+    {
+        return Middleware::retry(
+            function (
+                $retries,
+                RequestInterface $request,
+                ResponseInterface $response = null
+            ) {
+                // Limit the number of retries to 2
+                if ($retries < $this->app->config->get('http.max_retries', 1) && $response && $body = $response->getBody()) {
+                    // Retry on server errors
+                    $response = json_decode($body, true);
+
+                    if (!empty($response['errcode']) && in_array(abs($response['errcode']), [40001, 40014, 42001], true)) {
+                        $this->app['logger']->debug('Retrying with refreshed access token.');
+                        return true;
+                    }
+                }
+
+                return false;
+            },
+            function () {
+                return abs($this->app->config->get('http.retry_delay', 500));
+            }
+        );
+    }
 }

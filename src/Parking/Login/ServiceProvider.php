@@ -1,6 +1,6 @@
 <?php
 
-namespace VSing\ParkingPlatform\Parking\Query;
+namespace VSing\ParkingPlatform\Parking\login;
 
 
 use Pimple\Container;
@@ -20,8 +20,8 @@ class ServiceProvider implements ServiceProviderInterface
     public function register(Container $pimple): void
     {
 
-        !isset($pimple['queryCarByCarNo']) && $pimple['queryCarByCarNo'] = function ($pimple) {
-            return new QueryCarByCarNo($pimple);
+        !isset($pimple['login']) && $pimple['login'] = function ($pimple) {
+            return new Client($pimple);
         };
 
     }

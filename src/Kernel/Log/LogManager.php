@@ -565,6 +565,7 @@ class LogManager implements LoggerInterface
      */
     public function debug($message, array $context = []): void
     {
+
         $this->driver()->debug($message, $context);
     }
 
