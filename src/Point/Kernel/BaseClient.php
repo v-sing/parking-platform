@@ -9,6 +9,7 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LogLevel;
 use VSing\ParkingPlatform\Kernel\Contracts\Arrayable;
+use VSing\ParkingPlatform\Kernel\Events\HttpResponseCreated;
 use VSing\ParkingPlatform\Kernel\Exceptions\InvalidConfigException;
 use VSing\ParkingPlatform\Kernel\Http\Response;
 use VSing\ParkingPlatform\Kernel\Log\LogManager;
@@ -68,11 +69,34 @@ class BaseClient
         $query        = '?openId=' . $openid . '&signature=' . $signature . '&timestamp=' . time();
         try {
             $res = $this->request($url . $query, 'POST', ['form_params' => $data]);
-            return json_decode((string)$res->getBody(), true) ?? ['status' => -1, '请求失败'];
+            return $res ?? ['status' => -1, '请求失败'];
         } catch (GuzzleException $e) {
             return ['status' => -1, '请求失败'];
         }
 
+    }
+
+    /**
+     * @param string $url
+     * @param string $method
+     * @param array $options
+     *
+     * @return array|object|Arrayable|Response|Collection|ResponseInterface
+     *
+     * @throws InvalidConfigException
+     * @throws GuzzleException
+     */
+    public function request(string $url, string $method = 'GET', array $options = [], $returnRaw = false)
+    {
+
+        if (empty($this->middlewares)) {
+            $this->registerHttpMiddlewares();
+        }
+
+        $response = $this->performRequest($url, $method, $options);
+        $this->app->events->dispatch(new HttpResponseCreated($response));
+
+        return $returnRaw ? $response : $this->castResponseToType($response, $this->app->config->get('response_type'));
     }
 
     /**
@@ -109,7 +133,6 @@ class BaseClient
     protected function logMiddleware()
     {
         $formatter = new MessageFormatter($this->app['config']['http.log_template'] ?? MessageFormatter::DEBUG);
-
         return Middleware::log($this->app['logger'], $formatter, LogLevel::DEBUG);
     }
 
