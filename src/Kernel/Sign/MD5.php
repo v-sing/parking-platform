@@ -90,7 +90,6 @@ class MD5
         $arg = urldecode(http_build_query($para));
         //如果存在转义字符，那么去掉转义
 //        $arg = stripslashes($arg);
-//        var_dump($arg );exit();
         return $arg;
     }
 

@@ -17,8 +17,8 @@ class Client extends BaseClient
     {
         $data = [
             'cid'      => $this->app->config->get('cid'),
-            'user'     => $this->app->config->get('user'),
-            'password' => $this->app->config->get('password')
+            'usr'     => $this->app->config->get('user'),
+            'psw' => $this->app->config->get('password')
         ];
         $dat  = http_build_query($data);
         try {

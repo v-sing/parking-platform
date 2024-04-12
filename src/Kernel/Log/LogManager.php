@@ -162,7 +162,6 @@ class LogManager implements LoggerInterface
     {
 
         $config = $this->app['config']->get(\sprintf('log.channels.%s', $name));
-//        var_dump($config);exit;
         if (is_null($config)) {
             throw new InvalidArgumentException(\sprintf('Log [%s] is not defined.', $name));
         }
