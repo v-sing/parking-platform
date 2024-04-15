@@ -5,7 +5,7 @@ namespace VSing\ParkingPlatform\Parking\login;
 
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
-
+use VSing\ParkingPlatform\Parking\Login\Client;
 class ServiceProvider implements ServiceProviderInterface
 {
 

@@ -52,7 +52,7 @@ class CacheServiceProvider implements ServiceProviderInterface
             return [
                 'cache' => [
                     // 驱动方式
-                    'type'   => 'FILE',
+                    'type'   => 'File',
                     // 缓存保存目录
                     'path'   => \sys_get_temp_dir() . '/cache/parkingPlatform.log',
                     // 缓存前缀
@@ -65,7 +65,7 @@ class CacheServiceProvider implements ServiceProviderInterface
         return [
             'cache' => [
                 // 驱动方式
-                'type'   => $app['config']->get('cache.type') ?? 'FILE',
+                'type'   => $app['config']->get('cache.type') ?? 'File',
                 // 缓存保存目录
                 'path'   => $app['config']->get('cache.path') ?? \sys_get_temp_dir() . '/cache/parkingPlatform.log',
                 // 缓存前缀
